@@ -9,11 +9,7 @@ namespace BFS_c_sharp
     {
         static RandomDataGenerator generator = new RandomDataGenerator();
         static List<UserNode> users = generator.Generate();
-        static Queue<UserNode> SearchQueue = new Queue<UserNode>();
-        static HashSet<UserNode> AlreadySearchedSet = new HashSet<UserNode>();
-        static Queue<UserNode> NextSearch = new Queue<UserNode>();
-        static int DistanceCounter = 1;
-
+        
         static void Main(string[] args)
         {
             
@@ -22,40 +18,48 @@ namespace BFS_c_sharp
                 Console.WriteLine(user);
             }
             var root = users[0];
-            var goal = users[15];
-
-            SearchQueue.Enqueue(root);
-            AlreadySearchedSet.Add(root);
-            Search(root, goal);
+            var goal = users[5];
+            int distance = Search(root, goal);
             Console.WriteLine("Searching. Root: " + root.FirstName + " " + root.LastName +
-                ". Distance to: " + goal.FirstName + " " + goal.LastName + " is: " + DistanceCounter);
+                ". Distance to: " + goal.FirstName + " " + goal.LastName + " is: " + distance);
             Console.WriteLine("Done");
             Console.ReadKey();
         }
 
-        public static void Search(UserNode Current, UserNode searchFor)
+        public static int Search(UserNode root, UserNode searchFor)
         {
+            int DistanceCounter = 1;
+            Queue<UserNode> SearchQueue = new Queue<UserNode>();
+            HashSet<UserNode> AlreadySearchedSet = new HashSet<UserNode>();
+            Queue<UserNode> NextSearch = new Queue<UserNode>();
+            SearchQueue.Enqueue(root);
+            AlreadySearchedSet.Add(root);
+
+            while (SearchQueue.Count > 0)
+            {
+                UserNode Current = SearchQueue.Dequeue();
                 if (Current.Friends.Contains(searchFor))
                 {
-                    return;
+                    return DistanceCounter;
                 }
-
+                
                 foreach (UserNode friend in Current.Friends)
                 {
                     if (!AlreadySearchedSet.Contains(friend))
                     {
+                        // Maybe a SearchNext Queue, where I ENqueue the friends..
                         SearchQueue.Enqueue(friend);
                         AlreadySearchedSet.Add(friend);
                     }
 
                 }
-            DistanceCounter++;
-            Current = SearchQueue.Dequeue();
-            Search(Current, searchFor);
+                
+                DistanceCounter++; //this shouldn't be here, but then where should it be??
             }
+            return DistanceCounter;
         }
     }
-
+}
     /* public static int DistanceBetweenTwoUser(UserNode starting, UserNode ending)
      {
          Queue<UserNode> UserToCheckNow = new Queue<UserNode>();
